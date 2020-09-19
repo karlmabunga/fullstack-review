@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import Search from './components/Search.jsx';
 import RepoList from './components/RepoList.jsx';
-import getReposByUsername from '../../helpers/github.js';
+import axios from 'axios';
 
 class App extends React.Component {
   constructor(props) {
@@ -14,17 +14,28 @@ class App extends React.Component {
 
   }
 
+  componentDidMount() {
+    axios.get('/repos')
+      .then(response => this.setState({
+        repos: response.data
+      }))
+  }
+
   search (term) {
     console.log(`${term} was searched`);
     // TODO
-    getReposByUsername({search: term})
+    axios.post(`/repos`, {
+      params: {
+        user: term
+      }
+    })
   }
 
   render () {
     return (<div>
       <h1>Github Fetcher</h1>
-      <RepoList repos={this.state.repos}/>
       <Search onSearch={this.search.bind(this)}/>
+      <RepoList repos={this.state.repos}/>
     </div>)
   }
 }
